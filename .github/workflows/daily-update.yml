@@ -1,0 +1,37 @@
+name: Daily Concept Update
+
+on:
+  schedule:
+    # 9:45 AM CST = 1:45 AM UTC
+    - cron: '45 1 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run update script
+        run: python scripts/update_concepts.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --staged --quiet; then
+            echo "没有变化，跳过提交"
+          else
+            git commit -m "每日概念更新 $(date -u +%Y-%m-%d)"
+            git push
+          fi

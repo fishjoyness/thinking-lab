@@ -1,0 +1,4 @@
+.workbuddy/
+*.tmp
+test_index.html
+__pycache__/
